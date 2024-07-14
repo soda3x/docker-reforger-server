@@ -1,0 +1,20 @@
+---
+version: '3.8'
+services:
+  arma-reforger:
+    image: soda3x/docker-reforger:latest
+    platform: linux/amd64
+    container_name: arma-reforger
+    build:
+      context: .
+    ports:
+      - "2001:2001/udp"
+      - "17777:17777/udp"
+      - "19999:19999/udp" # RCON
+    volumes:
+      - ./reforger/configs:/home/reforger/configs
+      - ./reforger/profile:/home/reforger/profile
+      - ./reforger/workshop:/home/reforger/workshop
+    environment:
+      - CONFIG="myconfig" # Name of your config (without path or .json extension)
+      - USE_EXPERIMENTAL=false # Set to true to use Experimental branch of Reforger server
