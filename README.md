@@ -22,7 +22,7 @@ If you would like to host a server using the experimental branch, set the `USE_E
 version: '3.8'
 services:
   arma-reforger:
-    image: soda3x/docker-reforger:latest
+    image: soda3x/docker-reforger-server:latest
     platform: linux/amd64
     container_name: arma-reforger
     build:
