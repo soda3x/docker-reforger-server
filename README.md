@@ -25,8 +25,6 @@ services:
     image: soda3x/docker-reforger-server:latest
     platform: linux/amd64
     container_name: arma-reforger
-    build:
-      context: .
     ports:
       - "2001:2001/udp"
       - "17777:17777/udp"
