@@ -34,6 +34,6 @@ services:
       - ./reforger/profile:/home/reforger/profile
       - ./reforger/workshop:/home/reforger/workshop
     environment:
-      - CONFIG="myconfig" # Name of your config (without path or .json extension)
+      - CONFIG=myconfig # Name of your config (without path or .json extension)
       - USE_EXPERIMENTAL=false # Set to true to use Experimental branch of Reforger server
 ```
