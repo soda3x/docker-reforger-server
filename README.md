@@ -35,4 +35,5 @@ services:
     environment:
       - CONFIG=myconfig # Name of your config (without path or .json extension)
       - USE_EXPERIMENTAL=false # Set to true to use Experimental branch of Reforger server
+      - MAX_FPS=60 # Limit the FPS of your server
 ```

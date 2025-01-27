@@ -41,7 +41,7 @@ ENV USE_EXPERIMENTAL=false
 ENV CONFIG=""
 ENV MAX_FPS=60
 
-WORKDIR /home/reforger
+WORKDIR /home/reforger/reforger_bins
 
 VOLUME /home/reforger/steamcmd
 VOLUME /home/reforger/profile
