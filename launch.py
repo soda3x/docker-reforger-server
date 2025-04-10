@@ -31,5 +31,14 @@ launch = " ".join(
         f"-addonsDir /home/reforger/workshop"
     ]
 )
+
+# Check for additional Startup parameters and append them
+startup_parameters = os.environ.get("STARTUP_PARAMETERS", "")
+if startup_parameters:
+    launch.extend([f"{param}" for param in startup_parameters.split()])
+
+# Print the full command for debugging
 print(launch, flush=True)
+
+# Run the server with the full command
 os.system(launch)
