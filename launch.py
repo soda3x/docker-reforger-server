@@ -7,9 +7,12 @@ EXPERIMENTAL_BRANCH_APPID = "1890870"
 
 # Retrieve the maximum amount of acceptable restarts before calling the time of death (None will allow infinite restarts)
 def get_max_restarts():
-    val = os.environ.get("MAX_RESTARTS", "").strip()
-    if val.isdigit():
-        return int(val)
+    val = os.environ.get("MAX_RESTARTS", "")
+    if val and val.strip():
+        val = val.strip()
+        if val.isdigit():
+            return int(val)
+        return None
     return None
 
 def select_branch() -> str:
