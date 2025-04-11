@@ -1,8 +1,16 @@
 import os
 import subprocess
+from datetime import datetime
 
 STABLE_BRANCH_APPID = "1874900"
 EXPERIMENTAL_BRANCH_APPID = "1890870"
+
+# Retrieve the maximum amount of acceptable restarts before calling the time of death (None will allow infinite restarts)
+def get_max_restarts():
+    val = os.environ.get("MAX_RESTARTS", "").strip()
+    if val.isdigit():
+        return int(val)
+    return None
 
 def select_branch() -> str:
     """
@@ -47,6 +55,9 @@ def build_launch_command() -> str:
 def main():
     update_server()
 
+    max_restarts = get_max_restarts()
+    restart_count = 0
+
     while True:
         launch = build_launch_command()
         print(f"Launching server:\n{launch}\n", flush=True)
@@ -58,6 +69,10 @@ def main():
             break
         else:
             print(f"Server crashed (exit code {result.returncode}).", flush=True)
+            if max_restarts is not None and restart_count >= max_restarts:
+                death_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                print(f"Reached max restart attempts ({max_restarts}). Giving up.\nTime of death: [{death_time}]")
+                break
 
 if __name__ == "__main__":
     main()
