@@ -12,14 +12,16 @@ def select_branch() -> str:
         return EXPERIMENTAL_BRANCH_APPID
     return STABLE_BRANCH_APPID
 
+# Verifies build for updates or missing installation and retrieves it
 def update_server():
     steamcmd = ["/home/reforger/steamcmd/steamcmd.sh"]
     steamcmd.extend(["+force_install_dir", "/home/reforger/reforger_bins"])
     steamcmd.extend(["+login", "anonymous"])
     steamcmd.extend(["+app_update", select_branch()])
     steamcmd.extend(["validate", "+quit"])
-    subprocess.call(steamcmd)
+    subprocess.run(steamcmd)
 
+# Builds full launch command with mandatory parameters and checks for optional parameters
 def build_launch_command() -> str:
     launch = " ".join(
         [
@@ -41,12 +43,21 @@ def build_launch_command() -> str:
 
     return launch
 
+# Main auto-restart loop
 def main():
     update_server()
-    launch = build_launch_command()
 
-    print(launch, flush=True)
-    os.system(launch)
+    while True:
+        launch = build_launch_command()
+        print(f"Launching server:\n{launch}\n", flush=True)
+
+        result = subprocess.run(launch, shell=True)
+
+        if result.returncode == 0:
+            print("Server exited cleanly. Stopping exiting launch.py auto-restart loop.", flush=True)
+            break
+        else:
+            print(f"Server crashed (exit code {result.returncode}).", flush=True)
 
 if __name__ == "__main__":
     main()
