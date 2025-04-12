@@ -7,6 +7,9 @@ from datetime import datetime
 STABLE_BRANCH_APPID = "1874900"
 EXPERIMENTAL_BRANCH_APPID = "1890870"
 
+# Global process reference to kill server process later if needed
+server_process = None
+
 def handle_shutdown(signum, frame):
     signals = {
         signal.SIGTERM: "SIGTERM", # Dockers sig for terminating container
@@ -14,6 +17,11 @@ def handle_shutdown(signum, frame):
     }
     signal_name = signals.get(signum, f"Signal {signum}")
     print(f"\n[!] Received {signal_name}. Exiting gracefully...\n", flush=True)
+
+    if server_process and server_process.poll() is None:
+        print("[!] Terminating server subprocess...", flush=True)
+        os.killpg(os.getpgid(server_process.pid), signal.SIGTERM)
+
     sys.exit(0)
 
 # Handling graceful exits
@@ -52,29 +60,27 @@ def update_server():
     subprocess.run(steamcmd)
 
 # Builds full launch command with mandatory parameters and checks for optional parameters
-def build_launch_command() -> str:
-    launch = " ".join(
-        [
-            "/home/reforger/reforger_bins/ArmaReforgerServer",
-            f"-config /home/reforger/configs/{os.environ['CONFIG']}.json",
-            "-createDB",
-            "-nothrow",
-            f"-maxFPS {os.environ['MAX_FPS']}",
-            f"-profile /home/reforger/profile",
-            f"-addonDownloadDir /home/reforger/workshop",
-            f"-addonsDir /home/reforger/workshop"
-            f"-freezeCheck {os.environ['FREEZE_CHECK']} -freezeCheckMode crash"
-        ]
-    )
+def build_launch_command() -> list:
+    launch = [
+        "/home/reforger/reforger_bins/ArmaReforgerServer",
+        f"-config", f"/home/reforger/configs/{os.environ['CONFIG']}.json",
+        "-createDB",
+        "-nothrow",
+        f"-maxFPS", os.environ["MAX_FPS"],
+        "-profile", "/home/reforger/profile",
+        "-addonDownloadDir", "/home/reforger/workshop",
+        "-addonsDir", "/home/reforger/workshop",
+        "-freezeCheck", os.environ["FREEZE_CHECK"],
+        "-freezeCheckMode", "crash"
+    ]
 
-    # Check for additional Startup parameters and append them
     startup_parameters = os.environ.get("STARTUP_PARAMETERS", "")
     if startup_parameters and startup_parameters.strip():
-        launch += " " + startup_parameters.strip()
+        launch.extend(startup_parameters.strip().split())
 
     return launch
 
-# Main auto-restart loop
+# Main launch.py loop with auto-restart
 def main():
     update_server()
 
@@ -83,16 +89,21 @@ def main():
 
     while True:
         launch = build_launch_command()
-        print(f"Launching server:\n{launch}\n", flush=True)
+        print(f"Launching server:\n{' '.join(launch)}\n", flush=True)
 
-        result = subprocess.run(launch, shell=True)
+        server_process = subprocess.Popen(
+            launch,
+            preexec_fn=os.setsid
+        )
 
-        if result.returncode == 0:
-            print("Server exited cleanly. Stopping exiting launch.py auto-restart loop.", flush=True)
+        exit_code = server_process.wait()
+
+        if exit_code == 0:
+            print("Server exited gracefully. Exiting launch.py loop.", flush=True)
             break
         else:
             restart_count += 1
-            print(f"Server crashed (exit code {result.returncode}).", flush=True)
+            print(f"Server crashed (exit code {exit_code}).", flush=True)
             if max_restarts is not None and restart_count >= max_restarts:
                 death_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 print(f"Reached max restart attempts ({max_restarts}). Giving up.\nTime of death: [{death_time}]")
