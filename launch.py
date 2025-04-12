@@ -5,15 +5,16 @@ from datetime import datetime
 STABLE_BRANCH_APPID = "1874900"
 EXPERIMENTAL_BRANCH_APPID = "1890870"
 
-# Retrieve the maximum amount of acceptable restarts before calling the time of death (None will allow infinite restarts)
+# Retrieve the maximum amount of acceptable restarts before calling the time of death (None will allow infinite restarts, 0 disables auto-restart function)
 def get_max_restarts():
     val = os.environ.get("MAX_RESTARTS", "")
     if val and val.strip():
         val = val.strip()
         if val.isdigit():
             return int(val)
-        return None
-    return None
+        elif val.lower() == "none":
+            return None
+    return 0
 
 def select_branch() -> str:
     """
