@@ -11,9 +11,12 @@ def get_max_restarts():
     if val and val.strip():
         val = val.strip()
         if val.isdigit():
+            print("MAX_RESTARTS Set to: {int(val)}")
             return int(val)
         elif val.lower() == "none":
+            print("MAX_RESTARTS Set to: infinite restarts")
             return None
+    print("MAX_RESTARTS Set to: disabled")
     return 0
 
 def select_branch() -> str:
