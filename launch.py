@@ -63,6 +63,7 @@ def build_launch_command() -> str:
             f"-profile /home/reforger/profile",
             f"-addonDownloadDir /home/reforger/workshop",
             f"-addonsDir /home/reforger/workshop"
+            f"-freezeCheck {os.environ['FREEZE_CHECK']} -freezeCheckMode crash"
         ]
     )
 
