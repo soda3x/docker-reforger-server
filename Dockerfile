@@ -40,7 +40,7 @@ RUN apt-get update \
 ENV USE_EXPERIMENTAL=false
 ENV CONFIG=""
 ENV MAX_FPS=60
-
+ENV MAX_RESTARTS=0
 WORKDIR /home/reforger/reforger_bins
 
 VOLUME /home/reforger/steamcmd
