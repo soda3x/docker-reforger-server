@@ -1,9 +1,24 @@
 import os
 import subprocess
+import signal
+import sys
 from datetime import datetime
 
 STABLE_BRANCH_APPID = "1874900"
 EXPERIMENTAL_BRANCH_APPID = "1890870"
+
+# Handling graceful exits
+signal.signal(signal.SIGTERM, handle_shutdown)
+signal.signal(signal.SIGINT, handle_shutdown)
+
+def handle_shutdown(signum, frame):
+    signals = {
+        signal.SIGTERM: "SIGTERM", # Dockers sig for terminating container
+        signal.SIGINT: "SIGINT" # CTRL + C Exit
+    }
+    signal_name = signals.get(signum, f"Signal {signum}")
+    print(f"\n[!] Received {signal_name}. Exiting gracefully...\n", flush=True)
+    sys.exit(0)
 
 # Retrieve the maximum amount of acceptable restarts before calling the time of death (None will allow infinite restarts, 0 disables auto-restart function)
 def get_max_restarts():
@@ -11,12 +26,12 @@ def get_max_restarts():
     if val and val.strip():
         val = val.strip()
         if val.isdigit():
-            print("MAX_RESTARTS Set to: {int(val)}")
+            print(f"MAX_RESTARTS Set to: {int(val)}")
             return int(val)
         elif val.lower() == "none":
-            print("MAX_RESTARTS Set to: infinite restarts")
+            print(f"MAX_RESTARTS Set to: infinite restarts")
             return None
-    print("MAX_RESTARTS Set to: disabled")
+    print(f"MAX_RESTARTS Set to: disabled")
     return 0
 
 def select_branch() -> str:
