@@ -90,7 +90,7 @@ def main():
             print("Server exited cleanly. Stopping exiting launch.py auto-restart loop.", flush=True)
             break
         else:
-	    restart_count++
+            restart_count += 1
             print(f"Server crashed (exit code {result.returncode}).", flush=True)
             if max_restarts is not None and restart_count >= max_restarts:
                 death_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
