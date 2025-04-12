@@ -7,10 +7,6 @@ from datetime import datetime
 STABLE_BRANCH_APPID = "1874900"
 EXPERIMENTAL_BRANCH_APPID = "1890870"
 
-# Handling graceful exits
-signal.signal(signal.SIGTERM, handle_shutdown)
-signal.signal(signal.SIGINT, handle_shutdown)
-
 def handle_shutdown(signum, frame):
     signals = {
         signal.SIGTERM: "SIGTERM", # Dockers sig for terminating container
@@ -19,6 +15,10 @@ def handle_shutdown(signum, frame):
     signal_name = signals.get(signum, f"Signal {signum}")
     print(f"\n[!] Received {signal_name}. Exiting gracefully...\n", flush=True)
     sys.exit(0)
+
+# Handling graceful exits
+signal.signal(signal.SIGTERM, handle_shutdown)
+signal.signal(signal.SIGINT, handle_shutdown)
 
 # Retrieve the maximum amount of acceptable restarts before calling the time of death (None will allow infinite restarts, 0 disables auto-restart function)
 def get_max_restarts():
@@ -90,6 +90,7 @@ def main():
             print("Server exited cleanly. Stopping exiting launch.py auto-restart loop.", flush=True)
             break
         else:
+	    restart_count++
             print(f"Server crashed (exit code {result.returncode}).", flush=True)
             if max_restarts is not None and restart_count >= max_restarts:
                 death_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
