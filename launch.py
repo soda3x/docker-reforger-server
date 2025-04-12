@@ -31,5 +31,11 @@ launch = " ".join(
         f"-addonsDir /home/reforger/workshop"
     ]
 )
+
+# Check for additional Startup parameters and append them
+startup_parameters = os.environ.get("STARTUP_PARAMETERS", "")
+if startup_parameters and startup_parameters.strip():
+	launch += " " + startup_parameters.strip()
+
 print(launch, flush=True)
 os.system(launch)
