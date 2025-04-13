@@ -37,4 +37,7 @@ services:
       - USE_EXPERIMENTAL=false # Set to true to use Experimental branch of Reforger server
       - MAX_FPS=60 # Limit the FPS of your server
       - STARTUP_PARAMETERS="-nds 1 -nwkResolution 500" # Add as many additional startup parameters as needed
+      # Adds a maximum number of auto-restart attempts before giving up (default setting has auto-restart disabled)
+      - MAX_RESTARTS=3 # [None: Infinite restarts; 0: Disable auto-restart; 1-n: n number of restarts]
+      - FREEZE_CHECK=60 # Overrides time in seconds to forcefully crash on application freeze or completely disable detection (Default is 300 seconds)
 ```
