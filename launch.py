@@ -22,6 +22,7 @@ def handle_shutdown(signum, frame):
         print("[!] Terminating server subprocess...", flush=True)
         os.killpg(os.getpgid(server_process.pid), signal.SIGTERM)
 
+    server_process.wait()
     sys.exit(0)
 
 # Handling graceful exits
